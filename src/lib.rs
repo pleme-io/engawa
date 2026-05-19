@@ -71,6 +71,7 @@
 #![forbid(unsafe_code)]
 #![doc(html_root_url = "https://docs.rs/engawa/0.1.0")]
 
+pub mod dispatch;
 pub mod effect;
 pub mod error;
 pub mod graph;
@@ -79,6 +80,10 @@ pub mod node;
 pub mod pass;
 pub mod resource;
 
+pub use dispatch::{
+    DispatchError, Dispatcher, RecordedDispatch, RecordingDispatcher, ResourceBindings,
+    ResourceHandle,
+};
 pub use effect::Effect;
 pub use error::{EngawaError, ValidationError};
 pub use graph::{CompiledGraph, RenderGraph};
