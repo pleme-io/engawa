@@ -52,7 +52,15 @@ impl Rgb {
 /// `Hash`). Do not add variants without landing their geometry in
 /// [`emit_underline_rects`] — the total match there is the forcing
 /// function.
+///
+/// `ALL` is emitted by `pleme-allvariants-derive` — adding a variant
+/// mechanically grows the registry, so the len-pinned matrix tests
+/// (here and in mado) fail until the new variant is fully wired. A
+/// hand-listed ALL was the rot hole the M3 review closed (2026-06-12):
+/// the index-match "forcing function" was satisfiable without ever
+/// touching the registry.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Hash, Serialize, Deserialize)]
+#[derive(pleme_allvariants_derive::AllVariants)]
 #[serde(rename_all = "lowercase")]
 pub enum UnderlineStyle {
     #[default]
@@ -65,17 +73,6 @@ pub enum UnderlineStyle {
 }
 
 impl UnderlineStyle {
-    /// Mechanical registry of every variant. Matrix tests assert
-    /// len-equality against this — never hand-maintain a second list.
-    pub const ALL: [Self; 6] = [
-        Self::None,
-        Self::Single,
-        Self::Double,
-        Self::Curly,
-        Self::Dotted,
-        Self::Dashed,
-    ];
-
     /// Lowercase wire name (mado's MCP `CellSnapshot.underline`
     /// field). Matches the serde rename — one vocabulary.
     #[must_use]
@@ -259,22 +256,35 @@ pub fn emit_underline_rects(style: UnderlineStyle, metrics: UnderlineMetrics) ->
     match style {
         UnderlineStyle::None => UnderlineGeometry::None,
         UnderlineStyle::Single => UnderlineGeometry::Single(stroke),
+        // LAW (2026-06-12): Double and Curly anchor their BOTTOM edge
+        // at the Single stroke's bottom (`underline_y + thickness`)
+        // and extend UPWARD. The prior lower-stroke-below placement
+        // put Double's second stroke entirely past the cell bottom
+        // under mado's metrics (underline_y = cell_height - 2,
+        // thickness = 1) — the next row's bg run painted over it and
+        // Double degraded to Single. No style may descend below the
+        // Single stroke; the matrix containment test pins this.
         UnderlineStyle::Double => UnderlineGeometry::Double {
-            upper: stroke,
-            lower: DecorationRect {
+            upper: DecorationRect {
                 // One-thickness gap between the two strokes.
-                y: metrics.underline_y + 2.0 * metrics.thickness,
+                y: metrics.underline_y - 2.0 * metrics.thickness,
                 ..stroke
             },
+            lower: stroke,
         },
         UnderlineStyle::Curly => {
-            // The wave owns the baseline→underline gap; floor at one
-            // thickness so degenerate metrics still wave visibly.
-            let amplitude = (metrics.underline_y - metrics.baseline).max(metrics.thickness);
+            // The wave owns the baseline→underline gap: amplitude is
+            // HALF the gap (the band is 2·amplitude + thickness tall,
+            // so a full-gap amplitude doubled the band past the gap —
+            // the pre-2026-06-12 overflow). Floor at one thickness so
+            // degenerate metrics still wave visibly; the band bottom
+            // stays anchored at the Single stroke's bottom either way.
+            let amplitude = ((metrics.underline_y - metrics.baseline) / 2.0)
+                .max(metrics.thickness);
             UnderlineGeometry::Curly(CurlyBand {
                 rect: DecorationRect {
                     x: 0.0,
-                    y: metrics.underline_y - amplitude,
+                    y: metrics.underline_y - 2.0 * amplitude,
                     width: metrics.cell_width,
                     height: 2.0 * amplitude + metrics.thickness,
                 },
@@ -317,26 +327,12 @@ mod tests {
 
     use super::*;
 
-    /// FORCING FUNCTION for [`UnderlineStyle::ALL`]: the index match
-    /// is total, so adding a variant fails to compile here until the
-    /// registry (and its length) is extended in the same change.
-    #[test]
-    fn all_registry_is_total_and_distinct() {
-        let mut seen = [false; UnderlineStyle::ALL.len()];
-        for style in UnderlineStyle::ALL {
-            let idx = match style {
-                UnderlineStyle::None => 0,
-                UnderlineStyle::Single => 1,
-                UnderlineStyle::Double => 2,
-                UnderlineStyle::Curly => 3,
-                UnderlineStyle::Dotted => 4,
-                UnderlineStyle::Dashed => 5,
-            };
-            assert!(!seen[idx], "duplicate registry entry: {style}");
-            seen[idx] = true;
-        }
-        assert!(seen.iter().all(|&s| s), "registry misses a variant");
-    }
+    // The former hand-list "forcing function" test
+    // (all_registry_is_total_and_distinct) is deleted: it was
+    // satisfiable by adding a match arm without touching ALL
+    // (M3 review, 2026-06-12). ALL is now derive-emitted from the
+    // variants, so registry totality + distinctness hold by
+    // construction and need no runtime witness.
 
     /// Pin the trait surface mado's style interning requires:
     /// `Attrs` lives inside an interned `Style` keyed by `Hash + Eq`.

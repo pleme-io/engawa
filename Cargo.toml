@@ -21,6 +21,11 @@ missing_panics_doc = "allow"
 [dependencies]
 serde = { version = "1", features = ["derive"] }
 thiserror = "2"
+# Mechanical ALL registry for the decoration vocabulary enum — per
+# the ★★ EMITTER SUBSTRATE rule, ALL is derived from the variants,
+# never hand-listed (macro farm, tatara-rust-ast). Build-time-only
+# proc-macro; the crate stays pure-data at runtime.
+pleme-allvariants-derive = { version = "0.1", git = "https://github.com/pleme-io/pleme-allvariants-derive" }
 
 [dev-dependencies]
 serde_json = "1"
