@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "cargo_lock_sha256": "c638567a53f5815af03fa3526c792016e1f0a74b77df33017a0f6e3ca748c480",
+  "cargo_lock_sha256": "20f0125d85a8fcba4e4681809889d212a388a2441c9a03851346e6189ed60c99",
   "target_resolves": {
     "base": {
       "autocfg-1.5.1": {
@@ -35,7 +35,7 @@
           "std"
         ]
       },
-      "bitflags-2.11.1": {
+      "bitflags-2.13.0": {
         "runtime_dependencies": [],
         "build_dependencies": [],
         "features": [
@@ -47,7 +47,7 @@
         "build_dependencies": [],
         "features": []
       },
-      "engawa-0.1.1": {
+      "engawa-0.1.2": {
         "runtime_dependencies": [
           {
             "name": "serde",
@@ -337,7 +337,7 @@
           "std"
         ]
       },
-      "memchr-2.8.1": {
+      "memchr-2.8.2": {
         "runtime_dependencies": [],
         "build_dependencies": [],
         "features": [
@@ -376,7 +376,7 @@
         "runtime_dependencies": [
           {
             "name": "zerocopy",
-            "package_key": "zerocopy-0.8.50",
+            "package_key": "zerocopy-0.8.52",
             "kind": "normal",
             "features": [
               "simd"
@@ -436,7 +436,7 @@
           },
           {
             "name": "bitflags",
-            "package_key": "bitflags-2.11.1",
+            "package_key": "bitflags-2.13.0",
             "kind": "normal",
             "features": [],
             "uses_default_features": true,
@@ -488,7 +488,7 @@
           },
           {
             "name": "regex_syntax",
-            "package_key": "regex-syntax-0.8.10",
+            "package_key": "regex-syntax-0.8.11",
             "kind": "normal",
             "features": [],
             "uses_default_features": true,
@@ -656,7 +656,7 @@
         "build_dependencies": [],
         "features": []
       },
-      "regex-syntax-0.8.10": {
+      "regex-syntax-0.8.11": {
         "runtime_dependencies": [],
         "build_dependencies": [],
         "features": [
@@ -824,7 +824,7 @@
           },
           {
             "name": "memchr",
-            "package_key": "memchr-2.8.1",
+            "package_key": "memchr-2.8.2",
             "kind": "normal",
             "features": [],
             "uses_default_features": false,
@@ -1037,7 +1037,7 @@
         "build_dependencies": [],
         "features": []
       },
-      "zerocopy-0.8.50": {
+      "zerocopy-0.8.52": {
         "runtime_dependencies": [],
         "build_dependencies": [],
         "features": [
@@ -1057,7 +1057,7 @@
             "runtime_dependencies": [
               {
                 "name": "bitflags",
-                "package_key": "bitflags-2.11.1",
+                "package_key": "bitflags-2.13.0",
                 "kind": "normal",
                 "features": [],
                 "uses_default_features": false,
@@ -1132,7 +1132,7 @@
             "runtime_dependencies": [
               {
                 "name": "bitflags",
-                "package_key": "bitflags-2.11.1",
+                "package_key": "bitflags-2.13.0",
                 "kind": "normal",
                 "features": [],
                 "uses_default_features": false,
@@ -1219,7 +1219,7 @@
             "runtime_dependencies": [
               {
                 "name": "bitflags",
-                "package_key": "bitflags-2.11.1",
+                "package_key": "bitflags-2.13.0",
                 "kind": "normal",
                 "features": [],
                 "uses_default_features": false,
@@ -1326,7 +1326,7 @@
             "runtime_dependencies": [
               {
                 "name": "bitflags",
-                "package_key": "bitflags-2.11.1",
+                "package_key": "bitflags-2.13.0",
                 "kind": "normal",
                 "features": [],
                 "uses_default_features": false,
@@ -1433,7 +1433,7 @@
             "runtime_dependencies": [
               {
                 "name": "bitflags",
-                "package_key": "bitflags-2.11.1",
+                "package_key": "bitflags-2.13.0",
                 "kind": "normal",
                 "features": [],
                 "uses_default_features": false,
@@ -1540,7 +1540,7 @@
             "runtime_dependencies": [
               {
                 "name": "bitflags",
-                "package_key": "bitflags-2.11.1",
+                "package_key": "bitflags-2.13.0",
                 "kind": "normal",
                 "features": [],
                 "uses_default_features": false,
@@ -1641,13 +1641,13 @@
     "bit-vec-0.8.0": {
       "edition": "2015"
     },
-    "bitflags-2.11.1": {
+    "bitflags-2.13.0": {
       "edition": "2021"
     },
     "cfg-if-1.0.4": {
       "edition": "2018"
     },
-    "engawa-0.1.1": {
+    "engawa-0.1.2": {
       "edition": "2024",
       "lib_target": {
         "name": "engawa",
@@ -1682,7 +1682,10 @@
       "edition": "2021",
       "build_script": "build.rs"
     },
-    "memchr-2.8.1": {
+    "linux-raw-sys-0.12.1": {
+      "edition": "2021"
+    },
+    "memchr-2.8.2": {
       "edition": "2021"
     },
     "num-traits-0.2.19": {
@@ -1721,7 +1724,7 @@
     "rand_xorshift-0.4.0": {
       "edition": "2021"
     },
-    "regex-syntax-0.8.10": {
+    "regex-syntax-0.8.11": {
       "edition": "2021"
     },
     "rustix-1.1.4": {
@@ -1784,16 +1787,13 @@
         }
       ]
     },
-    "zerocopy-0.8.50": {
+    "zerocopy-0.8.52": {
       "edition": "2021",
       "build_script": "build.rs"
     },
     "zmij-1.0.21": {
       "edition": "2021",
       "build_script": "build.rs"
-    },
-    "linux-raw-sys-0.12.1": {
-      "edition": "2021"
     }
   },
   "git_nar_sha256": {},
