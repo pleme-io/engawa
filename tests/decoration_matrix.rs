@@ -64,6 +64,15 @@ const MATRIX: &[MatrixRow] = &[
                 if lower.y <= upper.y {
                     v.push("Double lower rect must sit below upper");
                 }
+                // Bottom-anchored at the Single stroke position
+                // (M3 review 2026-06-12): the lower stroke IS the
+                // underline; the upper stroke stacks above it.
+                if lower.y != METRICS.underline_y {
+                    v.push("Double lower rect must anchor at underline_y");
+                }
+                if upper.y != METRICS.underline_y - 2.0 * METRICS.thickness {
+                    v.push("Double upper rect must sit one-thickness gap above");
+                }
                 if upper.height != METRICS.thickness || lower.height != METRICS.thickness {
                     v.push("Double rects must both be one-thickness tall");
                 }
@@ -91,6 +100,9 @@ const MATRIX: &[MatrixRow] = &[
                 }
                 if band.rect.height != 2.0 * band.amplitude + band.thickness {
                     v.push("Curly band rect must enclose wave + stroke");
+                }
+                if band.rect.y + band.rect.height != METRICS.underline_y + METRICS.thickness {
+                    v.push("Curly band bottom must anchor at the Single stroke bottom");
                 }
                 v
             }
@@ -154,7 +166,7 @@ fn every_underline_style_emits_its_geometry_shape() {
         "matrix must carry one row per UnderlineStyle variant"
     );
     let mut failures: Vec<(UnderlineStyle, &'static str)> = Vec::new();
-    for style in UnderlineStyle::ALL {
+    for style in UnderlineStyle::ALL.iter().copied() {
         match MATRIX.iter().filter(|row| row.style == style).count() {
             1 => {}
             0 => failures.push((style, "registry variant missing a matrix row")),
@@ -171,6 +183,38 @@ fn every_underline_style_emits_its_geometry_shape() {
         failures.is_empty(),
         "{} matrix violations: {failures:#?}",
         failures.len()
+    );
+}
+
+/// CONTAINMENT LAW (M3 review 2026-06-12): no style descends below
+/// the Single stroke's bottom edge (`underline_y + thickness`) under
+/// non-degenerate metrics. The consumer guarantees in-cell room for
+/// the Single stroke; anchoring every style's bottom inside that
+/// envelope makes "in-cell whenever Single is" hold for the whole
+/// vocabulary. The incident this pins: Double's lower stroke used to
+/// land entirely in the next row's pixel band and get overdrawn by
+/// its background — Double degraded to Single exactly where visible.
+#[test]
+fn no_style_descends_below_the_single_stroke_bottom() {
+    let envelope = METRICS.underline_y + METRICS.thickness;
+    let mut failures: Vec<(UnderlineStyle, f32)> = Vec::new();
+    for style in UnderlineStyle::ALL.iter().copied() {
+        let bottom = match emit_underline_rects(style, METRICS) {
+            UnderlineGeometry::None => continue,
+            UnderlineGeometry::Single(r) => r.y + r.height,
+            UnderlineGeometry::Double { upper, lower } => {
+                (upper.y + upper.height).max(lower.y + lower.height)
+            }
+            UnderlineGeometry::Run(run) => run.band.y + run.band.height,
+            UnderlineGeometry::Curly(band) => band.rect.y + band.rect.height,
+        };
+        if bottom > envelope {
+            failures.push((style, bottom));
+        }
+    }
+    assert!(
+        failures.is_empty(),
+        "styles descend below the Single stroke bottom ({envelope}): {failures:?}"
     );
 }
 

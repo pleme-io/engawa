@@ -162,9 +162,9 @@ rec {
       };
       "bitflags" = rec {
         crateName = "bitflags";
-        version = "2.11.1";
+        version = "2.13.0";
         edition = "2021";
-        sha256 = "1cvqijg3rvwgis20a66vfdxannjsxfy5fgjqkaq3l13gyfcj4lf4";
+        sha256 = "1y239gpvl061rfvav7jds8mjs42kmwi39is7yx5d1qw3hvp8nf5l";
         authors = [
           "The Rust Project Developers"
         ];
@@ -199,6 +199,10 @@ rec {
           "pleme-io"
         ];
         dependencies = [
+          {
+            name = "pleme-allvariants-derive";
+            packageId = "pleme-allvariants-derive";
+          }
           {
             name = "serde";
             packageId = "serde";
@@ -652,9 +656,9 @@ rec {
       };
       "log" = rec {
         crateName = "log";
-        version = "0.4.30";
+        version = "0.4.32";
         edition = "2021";
-        sha256 = "1rd6sw3gv9hb93464w7x3sip99zf8sjagm662r2ckg14b1lcavk1";
+        sha256 = "0fmdg0cxig7i4fwf1sw7fmg4d1gdbfzniawcfpwydy1q7320fgwm";
         authors = [
           "The Rust Project Developers"
         ];
@@ -675,9 +679,9 @@ rec {
       };
       "memchr" = rec {
         crateName = "memchr";
-        version = "2.8.1";
+        version = "2.8.2";
         edition = "2021";
-        sha256 = "1n448jx01h5z2xknj6x2dhxgr8s8fb717cf6vfqj5lmhkpj7m53b";
+        sha256 = "1i33wr49pcz2sbd12nds3n9fszay8kq5bk78gwciz462mcs49448";
         authors = [
           "Andrew Gallant <jamslam@gmail.com>"
           "bluss"
@@ -731,6 +735,35 @@ rec {
           "std" = [ "alloc" ];
         };
         resolvedDefaultFeatures = [ "alloc" "race" "std" ];
+      };
+      "pleme-allvariants-derive" = rec {
+        crateName = "pleme-allvariants-derive";
+        version = "0.1.0";
+        edition = "2024";
+        workspace_member = null;
+        src = pkgs.fetchgit {
+          url = "https://github.com/pleme-io/pleme-allvariants-derive";
+          rev = "c66f20d1dc5727cfa0d1f83a02a28609a13387ec";
+          sha256 = "11j1s270yizlc72hz946ifn8yz32h1gvyn7brpf4r32dfiwvf8sy";
+        };
+        procMacro = true;
+        libName = "pleme_allvariants_derive";
+        dependencies = [
+          {
+            name = "proc-macro2";
+            packageId = "proc-macro2";
+          }
+          {
+            name = "quote";
+            packageId = "quote";
+          }
+          {
+            name = "syn";
+            packageId = "syn";
+            features = [ "full" "extra-traits" ];
+          }
+        ];
+
       };
       "ppv-lite86" = rec {
         crateName = "ppv-lite86";
@@ -1066,9 +1099,9 @@ rec {
       };
       "regex-syntax" = rec {
         crateName = "regex-syntax";
-        version = "0.8.10";
+        version = "0.8.11";
         edition = "2021";
-        sha256 = "02jx311ka0daxxc7v45ikzhcl3iydjbbb0mdrpc1xgg8v7c7v2fw";
+        sha256 = "1m25h5q2wp976fb9gc3dsc9l99svcvd5cri8lncb51c46ydgzxnn";
         libName = "regex_syntax";
         authors = [
           "The Rust Project Developers"
@@ -1412,7 +1445,7 @@ rec {
           "proc-macro" = [ "proc-macro2/proc-macro" "quote?/proc-macro" ];
           "test" = [ "syn-test-suite/all-features" ];
         };
-        resolvedDefaultFeatures = [ "clone-impls" "default" "derive" "full" "parsing" "printing" "proc-macro" ];
+        resolvedDefaultFeatures = [ "clone-impls" "default" "derive" "extra-traits" "full" "parsing" "printing" "proc-macro" ];
       };
       "tempfile" = rec {
         crateName = "tempfile";
@@ -2317,9 +2350,9 @@ rec {
       };
       "zerocopy" = rec {
         crateName = "zerocopy";
-        version = "0.8.50";
+        version = "0.8.52";
         edition = "2021";
-        sha256 = "1laahnfxs4qyfb1fdf5nbb2qfshi72b1hbi0ffp2zy2m1r7ms1iv";
+        sha256 = "0gv563swc1yn3k8w3wjj07a8q293rkx99nfp3a25vzzmbycj446f";
         authors = [
           "Joshua Liebow-Feeser <joshlf@google.com>"
           "Jack Wrenn <jswrenn@amazon.com>"
@@ -2353,9 +2386,9 @@ rec {
       };
       "zerocopy-derive" = rec {
         crateName = "zerocopy-derive";
-        version = "0.8.50";
+        version = "0.8.52";
         edition = "2021";
-        sha256 = "0fdnr9qslx1hbn2i9rsvy9s95mychfy2vj90ajsjm2basccinqqb";
+        sha256 = "0c3rhsh4sd9kdym4z55zprybjkydy9y2gvw75d72aapcfa5z7rqs";
         procMacro = true;
         libName = "zerocopy_derive";
         authors = [

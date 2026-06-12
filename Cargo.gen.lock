@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "cargo_lock_sha256": "20f0125d85a8fcba4e4681809889d212a388a2441c9a03851346e6189ed60c99",
+  "cargo_lock_sha256": "803e132e6dbb66d52d2162f3932c835a87648475d2ba8fbab5273703bb2041c2",
   "target_resolves": {
     "base": {
       "autocfg-1.5.1": {
@@ -49,6 +49,16 @@
       },
       "engawa-0.1.2": {
         "runtime_dependencies": [
+          {
+            "name": "pleme_allvariants_derive",
+            "package_key": "pleme-allvariants-derive-0.1.0-c66f20d1dc5727cfa0d1f83a02a28609a13387ec",
+            "kind": "normal",
+            "features": [],
+            "uses_default_features": true,
+            "optional": false,
+            "target": null,
+            "tree": "host"
+          },
           {
             "name": "serde",
             "package_key": "serde-1.0.228",
@@ -371,6 +381,45 @@
           "race",
           "std"
         ]
+      },
+      "pleme-allvariants-derive-0.1.0-c66f20d1dc5727cfa0d1f83a02a28609a13387ec": {
+        "runtime_dependencies": [
+          {
+            "name": "proc_macro2",
+            "package_key": "proc-macro2-1.0.106",
+            "kind": "normal",
+            "features": [],
+            "uses_default_features": true,
+            "optional": false,
+            "target": null,
+            "tree": "target"
+          },
+          {
+            "name": "quote",
+            "package_key": "quote-1.0.45",
+            "kind": "normal",
+            "features": [],
+            "uses_default_features": true,
+            "optional": false,
+            "target": null,
+            "tree": "target"
+          },
+          {
+            "name": "syn",
+            "package_key": "syn-2.0.117",
+            "kind": "normal",
+            "features": [
+              "full",
+              "extra-traits"
+            ],
+            "uses_default_features": true,
+            "optional": false,
+            "target": null,
+            "tree": "target"
+          }
+        ],
+        "build_dependencies": [],
+        "features": []
       },
       "ppv-lite86-0.2.21": {
         "runtime_dependencies": [
@@ -897,6 +946,7 @@
           "clone-impls",
           "default",
           "derive",
+          "extra-traits",
           "full",
           "parsing",
           "printing",
@@ -1682,9 +1732,6 @@
       "edition": "2021",
       "build_script": "build.rs"
     },
-    "linux-raw-sys-0.12.1": {
-      "edition": "2021"
-    },
     "memchr-2.8.2": {
       "edition": "2021"
     },
@@ -1694,6 +1741,10 @@
     },
     "once_cell-1.21.4": {
       "edition": "2021"
+    },
+    "pleme-allvariants-derive-0.1.0-c66f20d1dc5727cfa0d1f83a02a28609a13387ec": {
+      "edition": "2024",
+      "proc_macro": true
     },
     "ppv-lite86-0.2.21": {
       "edition": "2021"
@@ -1794,8 +1845,13 @@
     "zmij-1.0.21": {
       "edition": "2021",
       "build_script": "build.rs"
+    },
+    "linux-raw-sys-0.12.1": {
+      "edition": "2021"
     }
   },
-  "git_nar_sha256": {},
+  "git_nar_sha256": {
+    "pleme-allvariants-derive-0.1.0-c66f20d1dc5727cfa0d1f83a02a28609a13387ec": "sha256-XiO3eXRNjEzczetYv1+AYnyPrIuGpA/FYfRHD47QQYY="
+  },
   "flake_metadata": {}
 }
