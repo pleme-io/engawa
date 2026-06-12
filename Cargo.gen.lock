@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "cargo_lock_sha256": "803e132e6dbb66d52d2162f3932c835a87648475d2ba8fbab5273703bb2041c2",
+  "cargo_lock_sha256": "dc45d4470c9f33b23c6b00414b536a01057a777e13f9d74da39fd535df02e2d6",
   "target_resolves": {
     "base": {
       "autocfg-1.5.1": {
@@ -47,7 +47,7 @@
         "build_dependencies": [],
         "features": []
       },
-      "engawa-0.1.2": {
+      "engawa-0.1.3": {
         "runtime_dependencies": [
           {
             "name": "pleme_allvariants_derive",
@@ -1697,7 +1697,7 @@
     "cfg-if-1.0.4": {
       "edition": "2018"
     },
-    "engawa-0.1.2": {
+    "engawa-0.1.3": {
       "edition": "2024",
       "lib_target": {
         "name": "engawa",
