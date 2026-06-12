@@ -18,7 +18,7 @@
 //! verification ladder). Pulling in bevy wholesale would invalidate
 //! that work.
 //!
-//! Engawa keeps the parts of bevy_render's design that fit:
+//! Engawa keeps the parts of `bevy_render`'s design that fit:
 //!
 //! * **Typed DAG of render nodes** with explicit input/output
 //!   resources (textures, samplers, uniform buffers, storage
@@ -64,13 +64,14 @@
 //!
 //! v0.1.0 ships the pure-data IR + topo-sort + validation +
 //! extensive unit-test coverage. Wgpu wiring (taking a
-//! `CompiledGraph` and dispatching against a wgpu::Device + a
-//! garasu HeadlessTarget) lands in v0.2 once the IR has been
+//! `CompiledGraph` and dispatching against a `wgpu::Device` + a
+//! garasu `HeadlessTarget`) lands in v0.2 once the IR has been
 //! exercised against mado's existing post-pipeline.
 
 #![forbid(unsafe_code)]
 #![doc(html_root_url = "https://docs.rs/engawa/0.1.0")]
 
+pub mod decoration;
 pub mod dispatch;
 pub mod effect;
 pub mod error;
@@ -80,6 +81,10 @@ pub mod node;
 pub mod pass;
 pub mod resource;
 
+pub use decoration::{
+    CurlyBand, DecorationRect, Rgb, SegmentRun, UnderlineColor, UnderlineGeometry,
+    UnderlineMetrics, UnderlineStyle, emit_underline_rects, overline_rect,
+};
 pub use dispatch::{
     DispatchError, Dispatcher, RecordedDispatch, RecordingDispatcher, ResourceBindings,
     ResourceHandle,

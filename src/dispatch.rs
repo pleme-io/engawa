@@ -106,7 +106,7 @@ impl ResourceBindings {
     }
 
     /// Iterate every (id, handle) pair in deterministic order
-    /// (BTreeMap is sorted).
+    /// (`BTreeMap` is sorted).
     pub fn iter(&self) -> impl Iterator<Item = (&ResourceId, &ResourceHandle)> {
         self.inner.iter()
     }
