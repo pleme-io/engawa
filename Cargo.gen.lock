@@ -1732,6 +1732,9 @@
       "edition": "2021",
       "build_script": "build.rs"
     },
+    "linux-raw-sys-0.12.1": {
+      "edition": "2021"
+    },
     "memchr-2.8.2": {
       "edition": "2021"
     },
@@ -1845,9 +1848,6 @@
     "zmij-1.0.21": {
       "edition": "2021",
       "build_script": "build.rs"
-    },
-    "linux-raw-sys-0.12.1": {
-      "edition": "2021"
     }
   },
   "git_nar_sha256": {
