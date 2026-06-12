@@ -121,7 +121,7 @@ fn missing_input_binding_errors() {
             assert!(node.as_str() == "clear" || node.as_str() == "fx");
             assert_eq!(resource.as_str(), "A");
         }
-        other => panic!("expected MissingBinding, got {other:?}"),
+        DispatchError::Backend(other) => panic!("expected MissingBinding, got Backend({other})"),
     }
 }
 
@@ -141,7 +141,7 @@ fn missing_output_binding_errors() {
             assert_eq!(node.as_str(), "fx");
             assert_eq!(resource.as_str(), "B");
         }
-        other => panic!("expected MissingBinding, got {other:?}"),
+        DispatchError::Backend(other) => panic!("expected MissingBinding, got Backend({other})"),
     }
 }
 

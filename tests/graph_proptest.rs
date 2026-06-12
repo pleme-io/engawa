@@ -48,9 +48,9 @@ fn fullscreen_material(name: &str) -> Material {
     }
 }
 
-/// Build a chain of `n` nodes: clear(out=R0) → fx_1(in=R0, out=R1)
-/// → … → fx_(n-1)(in=R(n-2), out=R(n-1)). Valid by construction
-/// for any n ≥ 1.
+/// Build a chain of `n` nodes: `clear(out=R0)` → `fx_1(in=R0, out=R1)`
+/// → … → `fx_(n-1)(in=R(n-2), out=R(n-1))`. Valid by construction
+/// for any `n` ≥ 1.
 fn chain_graph(n: usize) -> RenderGraph {
     let mut g = RenderGraph::default();
     for i in 0..n {
@@ -208,12 +208,12 @@ proptest! {
 
         let result = g.compile();
         match result {
-            Err(EngawaError::Validation(ValidationError::MultipleWriters(_))) => {
-                // Two writers to the same resource — also a
-                // valid catch (the chain already writes R(cycle_to)).
-            }
-            Err(EngawaError::Validation(ValidationError::Cycle(_))) => {
-                // Direct cycle detection.
+            Err(EngawaError::Validation(
+                ValidationError::MultipleWriters(_) | ValidationError::Cycle(_),
+            )) => {
+                // Direct cycle detection, or two writers to the same
+                // resource (the chain already writes R(cycle_to)) —
+                // both are valid catches.
             }
             Ok(c) => panic!(
                 "injected cycle compiled cleanly: {} nodes in order {:?}",
@@ -255,7 +255,7 @@ proptest! {
         // Bound: 1 ms per node is plenty even on a slow CI host.
         // Catches accidental O(n²) regressions in the topo sort.
         prop_assert!(
-            elapsed.as_millis() < (n as u128 * 1) + 100,
+            elapsed.as_millis() < (n as u128) + 100,
             "chain of {} compiled in {:?} (cap was {} ms)",
             n, elapsed, (n as u128) + 100
         );

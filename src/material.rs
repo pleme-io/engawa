@@ -4,7 +4,7 @@
 //! `Node`'s *where in the graph* layer. The split mirrors bevy's
 //! material/render-graph split but stays pure-data: no wgpu
 //! types, no rust closures, no compile-time codegen. The
-//! consumer turns a Material into a wgpu::RenderPipeline at
+//! consumer turns a Material into a `wgpu::RenderPipeline` at
 //! compile time.
 //!
 //! Tatara-lisp `(defmaterial …)` forms compile to this struct

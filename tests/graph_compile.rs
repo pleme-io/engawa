@@ -5,8 +5,8 @@
 //! and the operator-facing fluent builder.
 
 use engawa::{
-    BindingKind, Effect, Material, Node, PassKind, RenderGraph, ResourceId,
-    ResourceKind, ShaderSource, UniformBinding, ValidationError,
+    BindingKind, Effect, Material, Node, PassKind, RenderGraph, ResourceKind, ShaderSource,
+    UniformBinding, ValidationError,
 };
 
 // ── helpers ────────────────────────────────────────────────────
@@ -202,7 +202,7 @@ fn topo_sort_is_deterministic_across_independent_branches() {
     let ids2: Vec<_> = c2.iter_nodes().map(|n| n.id.clone()).collect();
     assert_eq!(ids1, ids2, "topo sort must be deterministic");
     assert_eq!(
-        ids1.iter().map(|i| i.as_str()).collect::<Vec<_>>(),
+        ids1.iter().map(engawa::NodeId::as_str).collect::<Vec<_>>(),
         vec!["clear-a", "clear-b", "clear-c"],
         "ready pool drained in sorted-id order"
     );
@@ -252,7 +252,7 @@ fn pass_kind_serde_uses_snake_case() {
 
 #[test]
 fn effect_priorities_sort_predictably() {
-    let mut effects = vec![
+    let mut effects = [
         Effect { name: "chrome".into(), enabled: true, priority: 800, material: dummy_material("c") },
         Effect { name: "scene".into(), enabled: true, priority: 100, material: dummy_material("s") },
         Effect { name: "post".into(), enabled: true, priority: 500, material: dummy_material("p") },
@@ -265,7 +265,7 @@ fn effect_priorities_sort_predictably() {
 
 #[test]
 fn disabled_effects_filter_cleanly() {
-    let effects = vec![
+    let effects = [
         Effect { name: "on".into(), enabled: true, priority: 100, material: dummy_material("on") },
         Effect { name: "off".into(), enabled: false, priority: 200, material: dummy_material("off") },
         Effect { name: "on2".into(), enabled: true, priority: 300, material: dummy_material("on2") },
