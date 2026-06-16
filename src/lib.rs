@@ -79,6 +79,7 @@ pub mod graph;
 pub mod material;
 pub mod node;
 pub mod pass;
+pub mod pipeline;
 pub mod resource;
 
 pub use decoration::{
@@ -92,7 +93,11 @@ pub use dispatch::{
 pub use effect::Effect;
 pub use error::{EngawaError, ValidationError};
 pub use graph::{CompiledGraph, RenderGraph};
-pub use material::{BindingKind, Material, ShaderSource, UniformBinding};
+pub use material::{BindingKind, Material, ShaderSource, ShaderStages, UniformBinding};
 pub use node::{Node, NodeId};
 pub use pass::PassKind;
+pub use pipeline::{
+    BlendMode, CompareFunction, CullMode, DepthSpec, DrawKind, FrontFace, RenderState,
+    TextureFormat, Topology,
+};
 pub use resource::{ResourceId, ResourceKind};

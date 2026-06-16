@@ -33,19 +33,21 @@ fn texture_resource() -> ResourceKind {
     ResourceKind::Texture {
         width: Some(64),
         height: Some(64),
+        format: None,
+        sample_count: None,
     }
 }
 
 fn fullscreen_material(name: &str) -> Material {
-    Material {
-        name: name.to_string(),
-        shader: ShaderSource::inline("@fragment fn fs_main() -> @location(0) vec4<f32> { return vec4<f32>(0.0); }"),
-        bindings: vec![UniformBinding {
+    Material::new(
+        name,
+        ShaderSource::inline("@fragment fn fs_main() -> @location(0) vec4<f32> { return vec4<f32>(0.0); }"),
+        vec![UniformBinding {
             binding: 0,
             kind: BindingKind::Uniform,
             resource: ResourceId::new("frame"),
         }],
-    }
+    )
 }
 
 /// Build a chain of `n` nodes: `clear(out=R0)` → `fx_1(in=R0, out=R1)`

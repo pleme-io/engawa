@@ -12,17 +12,19 @@ use engawa::{
 // ── helpers ────────────────────────────────────────────────────
 
 fn dummy_material(name: &str) -> Material {
-    Material {
-        name: name.to_string(),
-        shader: ShaderSource::inline("@vertex fn vs_main() -> @builtin(position) vec4<f32> { return vec4<f32>(0.0); }"),
-        bindings: vec![],
-    }
+    Material::new(
+        name,
+        ShaderSource::inline("@vertex fn vs_main() -> @builtin(position) vec4<f32> { return vec4<f32>(0.0); }"),
+        vec![],
+    )
 }
 
 fn render_target(width: u32, height: u32) -> ResourceKind {
     ResourceKind::Texture {
         width: Some(width),
         height: Some(height),
+        format: None,
+        sample_count: None,
     }
 }
 
