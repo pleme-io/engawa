@@ -42,11 +42,7 @@ fn fullscreen_material(name: &str) -> Material {
     Material::new(
         name,
         ShaderSource::inline("@fragment fn fs_main() -> @location(0) vec4<f32> { return vec4<f32>(0.0); }"),
-        vec![UniformBinding {
-            binding: 0,
-            kind: BindingKind::Uniform,
-            resource: ResourceId::new("frame"),
-        }],
+        vec![UniformBinding::uniform(0, ResourceId::new("frame"))],
     )
 }
 

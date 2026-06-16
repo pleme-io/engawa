@@ -10,7 +10,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::material::Material;
-use crate::pass::PassKind;
+use crate::pass::{ComputeDispatch, PassKind};
 use crate::pipeline::{DepthSpec, DrawKind};
 use crate::resource::ResourceId;
 
@@ -71,6 +71,11 @@ pub struct Node {
     /// depth-tested 3D rendering. See [`DepthSpec`].
     #[serde(default)]
     pub depth: Option<DepthSpec>,
+    /// Threadgroup grid for a [`PassKind::Compute`] node. `None` for
+    /// render/blit nodes; **required** for a compute node — `compile()`
+    /// rejects a `Compute` pass with no dispatch. See [`ComputeDispatch`].
+    #[serde(default)]
+    pub dispatch: Option<ComputeDispatch>,
 }
 
 impl Node {
@@ -92,6 +97,7 @@ impl Node {
             material: Some(material),
             draw: DrawKind::FullscreenQuad,
             depth: None,
+            dispatch: None,
         }
     }
 
@@ -107,6 +113,31 @@ impl Node {
             material: None,
             draw: DrawKind::FullscreenQuad,
             depth: None,
+            dispatch: None,
+        }
+    }
+
+    /// Convenience constructor for a compute node: run `material`'s compute
+    /// kernel over `dispatch`'s threadgroup grid, reading `inputs` and writing
+    /// `outputs` (storage buffers / storage textures). The compute analog of
+    /// [`Node::fullscreen_effect`].
+    #[must_use]
+    pub fn compute(
+        id: impl Into<NodeId>,
+        material: Material,
+        dispatch: ComputeDispatch,
+        inputs: Vec<ResourceId>,
+        outputs: Vec<ResourceId>,
+    ) -> Self {
+        Self {
+            id: id.into(),
+            pass: PassKind::Compute,
+            inputs,
+            outputs,
+            material: Some(material),
+            draw: DrawKind::FullscreenQuad, // ignored for compute
+            depth: None,
+            dispatch: Some(dispatch),
         }
     }
 
@@ -122,6 +153,13 @@ impl Node {
     #[must_use]
     pub fn with_depth(mut self, depth: DepthSpec) -> Self {
         self.depth = Some(depth);
+        self
+    }
+
+    /// Set the compute dispatch grid. Builder-style.
+    #[must_use]
+    pub fn with_dispatch(mut self, dispatch: ComputeDispatch) -> Self {
+        self.dispatch = Some(dispatch);
         self
     }
 }

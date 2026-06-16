@@ -37,6 +37,7 @@ fn mesh_node() -> Node {
             index_count: 36,
         },
         depth: Some(DepthSpec::new("depth")),
+        dispatch: None,
     }
 }
 

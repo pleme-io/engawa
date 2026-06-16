@@ -95,7 +95,7 @@ pub use error::{EngawaError, ValidationError};
 pub use graph::{CompiledGraph, RenderGraph};
 pub use material::{BindingKind, Material, ShaderSource, ShaderStages, UniformBinding};
 pub use node::{Node, NodeId};
-pub use pass::PassKind;
+pub use pass::{ComputeDispatch, PassKind};
 pub use pipeline::{
     BlendMode, CompareFunction, CullMode, DepthSpec, DrawKind, FrontFace, RenderState,
     TextureFormat, Topology,
