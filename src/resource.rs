@@ -10,6 +10,8 @@
 
 use serde::{Deserialize, Serialize};
 
+use crate::pipeline::TextureFormat;
+
 /// Operator-friendly identifier for a resource. Short, stable,
 /// human-typeable. Used as the wire key in the IR + as the lookup
 /// key when the consumer binds wgpu handles at dispatch.
@@ -48,13 +50,24 @@ impl From<String> for ResourceId {
 pub enum ResourceKind {
     /// A 2D texture that can be rendered into AND sampled from.
     /// The canonical mado case: the cell-grid render pass writes
-    /// into a Texture; an effect pass samples it.
+    /// into a Texture; an effect pass samples it. For game use it
+    /// also carries an optional pixel `format` (color or depth)
+    /// and MSAA `sample_count`.
     Texture {
         /// Optional dimension hint. None means "match the
         /// graph's output dimensions" — most effects don't need
         /// to be told their resolution at IR time.
         width: Option<u32>,
         height: Option<u32>,
+        /// Optional pixel format. None = match the surface /
+        /// swapchain color format. Use a depth format here for a
+        /// depth attachment.
+        #[serde(default)]
+        format: Option<TextureFormat>,
+        /// Optional MSAA sample count (1 / 2 / 4 / 8). None = 1
+        /// (no multisampling).
+        #[serde(default)]
+        sample_count: Option<u32>,
     },
     /// A uniform buffer the consumer fills with per-frame data
     /// (resolution, time, cursor position, etc.).

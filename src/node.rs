@@ -4,12 +4,14 @@
 //! produce M output resources, via a `PassKind` (render / compute /
 //! blit). The graph topology is just `Node`s + their input/output
 //! `ResourceId`s; the compiler topo-sorts them into execution
-//! order.
+//! order. A node's `draw` says *how* it rasterizes (full-screen
+//! quad vs a mesh draw) and its `depth` enables depth testing.
 
 use serde::{Deserialize, Serialize};
 
 use crate::material::Material;
 use crate::pass::PassKind;
+use crate::pipeline::{DepthSpec, DrawKind};
 use crate::resource::ResourceId;
 
 /// Operator-friendly node identifier. Short, stable, distinct
@@ -59,6 +61,16 @@ pub struct Node {
     /// Optional material to dispatch. `None` is valid for nodes
     /// that just clear a target or do a pure blit (no shader).
     pub material: Option<Material>,
+    /// How this node issues its draw — a full-screen quad (the
+    /// default, every post-process effect) or an indexed/instanced
+    /// mesh draw. See [`DrawKind`].
+    #[serde(default)]
+    pub draw: DrawKind,
+    /// Optional depth attachment + comparison. `None` = no depth
+    /// test (the default for 2D effects); `Some` enables
+    /// depth-tested 3D rendering. See [`DepthSpec`].
+    #[serde(default)]
+    pub depth: Option<DepthSpec>,
 }
 
 impl Node {
@@ -78,6 +90,8 @@ impl Node {
             inputs: vec![input.into()],
             outputs: vec![output.into()],
             material: Some(material),
+            draw: DrawKind::FullscreenQuad,
+            depth: None,
         }
     }
 
@@ -91,6 +105,23 @@ impl Node {
             inputs: vec![],
             outputs: vec![output.into()],
             material: None,
+            draw: DrawKind::FullscreenQuad,
+            depth: None,
         }
+    }
+
+    /// Set an explicit draw call (a mesh draw). Builder-style.
+    #[must_use]
+    pub fn with_draw(mut self, draw: DrawKind) -> Self {
+        self.draw = draw;
+        self
+    }
+
+    /// Enable depth testing against the given depth attachment.
+    /// Builder-style.
+    #[must_use]
+    pub fn with_depth(mut self, depth: DepthSpec) -> Self {
+        self.depth = Some(depth);
+        self
     }
 }

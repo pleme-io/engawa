@@ -7,11 +7,11 @@ use engawa::{
 };
 
 fn dummy_material(name: &str) -> Material {
-    Material {
-        name: name.to_string(),
-        shader: ShaderSource::inline("@fragment fn fs_main() -> @location(0) vec4<f32> { return vec4<f32>(0.0); }"),
-        bindings: vec![],
-    }
+    Material::new(
+        name,
+        ShaderSource::inline("@fragment fn fs_main() -> @location(0) vec4<f32> { return vec4<f32>(0.0); }"),
+        vec![],
+    )
 }
 
 fn linear_chain_graph() -> engawa::CompiledGraph {
@@ -22,6 +22,8 @@ fn linear_chain_graph() -> engawa::CompiledGraph {
             ResourceKind::Texture {
                 width: Some(800),
                 height: Some(600),
+                format: None,
+                sample_count: None,
             },
         )
         .with_resource(
@@ -29,6 +31,8 @@ fn linear_chain_graph() -> engawa::CompiledGraph {
             ResourceKind::Texture {
                 width: Some(800),
                 height: Some(600),
+                format: None,
+                sample_count: None,
             },
         )
         .with_input("swap")
