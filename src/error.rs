@@ -49,4 +49,9 @@ pub enum ValidationError {
         "resource {0:?} is produced by multiple nodes; each resource must have a single writer"
     )]
     MultipleWriters(ResourceId),
+
+    #[error(
+        "compute node {0:?} has no dispatch grid; a PassKind::Compute node must carry a ComputeDispatch"
+    )]
+    ComputeWithoutDispatch(NodeId),
 }

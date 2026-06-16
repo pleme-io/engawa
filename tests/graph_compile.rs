@@ -228,11 +228,7 @@ fn render_graph_serde_round_trips() {
 
 #[test]
 fn binding_kind_serde_uses_snake_case_tag() {
-    let b = UniformBinding {
-        binding: 0,
-        kind: BindingKind::StorageRead,
-        resource: "x".into(),
-    };
+    let b = UniformBinding::storage_read(0, "x");
     let json = serde_json::to_string(&b).unwrap();
     assert!(json.contains("\"storage_read\""), "json: {json}");
     let back: UniformBinding = serde_json::from_str(&json).unwrap();

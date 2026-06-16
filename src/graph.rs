@@ -15,6 +15,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::error::{EngawaError, ValidationError};
 use crate::node::{Node, NodeId};
+use crate::pass::PassKind;
 use crate::resource::{ResourceId, ResourceKind};
 
 /// Pre-compile render graph — operator-authored, mutable, holds
@@ -80,6 +81,14 @@ impl RenderGraph {
         for n in &self.nodes {
             if !seen_nodes.insert(n.id.clone()) {
                 return Err(ValidationError::DuplicateNode(n.id.clone()).into());
+            }
+        }
+
+        // A compute node must declare its threadgroup grid — without a
+        // dispatch the backend has nothing to `dispatchThreadgroups` over.
+        for n in &self.nodes {
+            if n.pass == PassKind::Compute && n.dispatch.is_none() {
+                return Err(ValidationError::ComputeWithoutDispatch(n.id.clone()).into());
             }
         }
 
