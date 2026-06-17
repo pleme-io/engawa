@@ -126,21 +126,32 @@ impl RenderGraph {
             }
         }
 
-        // Topo-sort via Kahn's algorithm — deterministic order
-        // because we visit nodes in BTreeMap order on each step.
+        // Topo-sort via Kahn's algorithm over the DISTINCT producer→consumer
+        // edge set. Counting a dedup'd edge set (not raw input occurrences) is
+        // load-bearing: a node that reads the same resource twice — or reads
+        // several resources from one producer — contributes a SINGLE dependency
+        // edge, so its in-degree is the number of upstream nodes, never an
+        // inflated occurrence count that would strand it and read as a false
+        // cycle. Order is deterministic: ready nodes are visited in BTreeSet
+        // (sorted) order.
         let nodes_by_id: BTreeMap<NodeId, Node> =
             self.nodes.iter().map(|n| (n.id.clone(), n.clone())).collect();
-        let mut indeg: BTreeMap<NodeId, usize> = BTreeMap::new();
+        let mut edges: BTreeSet<(NodeId, NodeId)> = BTreeSet::new();
         for n in &self.nodes {
-            let mut count = 0usize;
             for input in &n.inputs {
                 if let Some(producer_id) = producer.get(input)
                     && *producer_id != n.id
                 {
-                    count += 1;
+                    edges.insert((producer_id.clone(), n.id.clone()));
                 }
             }
-            indeg.insert(n.id.clone(), count);
+        }
+        let mut indeg: BTreeMap<NodeId, usize> =
+            self.nodes.iter().map(|n| (n.id.clone(), 0usize)).collect();
+        for (_, consumer) in &edges {
+            if let Some(d) = indeg.get_mut(consumer) {
+                *d += 1;
+            }
         }
         let mut ready: BTreeSet<NodeId> = indeg
             .iter()
@@ -151,22 +162,13 @@ impl RenderGraph {
         while let Some(next_id) = ready.iter().next().cloned() {
             ready.remove(&next_id);
             order.push(next_id.clone());
-            // Decrement indeg of consumers of `next_id`'s outputs.
-            let node = &nodes_by_id[&next_id];
-            for out in &node.outputs {
-                for other in &self.nodes {
-                    if other.id == next_id {
-                        continue;
-                    }
-                    if other.inputs.contains(out)
-                        && let Some(d) = indeg.get_mut(&other.id)
-                    {
-                        if *d > 0 {
-                            *d -= 1;
-                        }
-                        if *d == 0 {
-                            ready.insert(other.id.clone());
-                        }
+            // Relax each edge out of `next_id` exactly once (the set guarantees
+            // uniqueness, so no consumer is decremented more than its edge count).
+            for (_, consumer) in edges.iter().filter(|(prod, _)| *prod == next_id) {
+                if let Some(d) = indeg.get_mut(consumer) {
+                    *d = d.saturating_sub(1);
+                    if *d == 0 {
+                        ready.insert(consumer.clone());
                     }
                 }
             }
