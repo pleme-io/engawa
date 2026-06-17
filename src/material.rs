@@ -70,6 +70,25 @@ pub enum ShaderSource {
     /// Path to a `.wgsl` file. The consumer's notify watcher
     /// reloads + recompiles on change.
     Path { path: String },
+    /// **Raw Metal Shading Language** source + explicit entry-point
+    /// names — the typed escape hatch for shader stages naga cannot
+    /// emit from WGSL (mesh / object / amplification shaders, tile /
+    /// programmable-blending kernels, procedural-AABB ray-query). The
+    /// backend compiles it with `newLibraryWithSource` and looks up
+    /// `vertex`/`fragment`/`compute` by the author-given names (no
+    /// naga rename pass). Author-controlled names because the author
+    /// wrote the MSL. This is the Metal-4-frontier authoring surface;
+    /// a backend that can't accept MSL (e.g. a wgpu preview) rejects it
+    /// at dispatch with a typed `UnsupportedShaderSource`.
+    Msl {
+        source: String,
+        /// Vertex (or mesh/object) entry-point function name.
+        vertex: Option<String>,
+        /// Fragment entry-point function name.
+        fragment: Option<String>,
+        /// Compute entry-point function name.
+        compute: Option<String>,
+    },
 }
 
 impl ShaderSource {
@@ -85,9 +104,35 @@ impl ShaderSource {
         Self::Path { path: path.into() }
     }
 
-    /// Operator-facing text — `inline:<first 40 chars>` for
-    /// inline sources, `path:<the path>` for paths. Useful in
-    /// log lines + validation errors so the operator can find
+    /// A raw-MSL render shader with explicit vertex + fragment entry names.
+    #[must_use]
+    pub fn msl_render(
+        source: impl Into<String>,
+        vertex: impl Into<String>,
+        fragment: impl Into<String>,
+    ) -> Self {
+        Self::Msl {
+            source: source.into(),
+            vertex: Some(vertex.into()),
+            fragment: Some(fragment.into()),
+            compute: None,
+        }
+    }
+
+    /// A raw-MSL compute kernel with an explicit entry name.
+    #[must_use]
+    pub fn msl_compute(source: impl Into<String>, compute: impl Into<String>) -> Self {
+        Self::Msl {
+            source: source.into(),
+            vertex: None,
+            fragment: None,
+            compute: Some(compute.into()),
+        }
+    }
+
+    /// Operator-facing text — `inline:<first 40 chars>` for inline
+    /// sources, `path:<the path>` for paths, `msl:<vs>/<fs>` for raw MSL.
+    /// Useful in log lines + validation errors so the operator can find
     /// what they're looking at.
     #[must_use]
     pub fn display_short(&self) -> String {
@@ -97,6 +142,12 @@ impl ShaderSource {
                 format!("inline:{preview}")
             }
             ShaderSource::Path { path } => format!("path:{path}"),
+            ShaderSource::Msl { vertex, fragment, compute, .. } => {
+                let v = vertex.as_deref().unwrap_or("-");
+                let f = fragment.as_deref().unwrap_or("-");
+                let c = compute.as_deref().unwrap_or("-");
+                format!("msl:{v}/{f}/{c}")
+            }
         }
     }
 }
