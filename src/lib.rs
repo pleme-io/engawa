@@ -76,6 +76,11 @@ pub mod dispatch;
 pub mod effect;
 pub mod error;
 pub mod graph;
+/// Tatara-lisp authoring surface (feature `lisp`) — `(defeffect …)` /
+/// `(defmaterial …)` forms compile 1:1 to the IR. engawa's "ishou for
+/// graphics": portable, typed, hot-reloadable effect authoring.
+#[cfg(feature = "lisp")]
+pub mod lisp;
 pub mod material;
 pub mod node;
 pub mod pass;

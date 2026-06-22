@@ -18,9 +18,26 @@ pedantic = { level = "warn", priority = -1 }
 missing_errors_doc = "allow"
 missing_panics_doc = "allow"
 
+[features]
+# `lisp` adds the tatara-lisp authoring surface (src/lisp.rs): author
+# effects/materials as `(defeffect …)`/`(defmaterial …)` forms that
+# compile 1:1 to the IR. Off by default so the pure-data core stays
+# free of the parser dep; consumers that author or hot-reload graphics
+# from Lisp enable `engawa/lisp`.
+lisp = ["dep:tatara-lisp", "dep:tatara-lisp-derive", "dep:serde_json"]
+
 [dependencies]
 serde = { version = "1", features = ["derive"] }
 thiserror = "2"
+# Tatara-lisp authoring surface (feature `lisp`). Pinned EXACTLY to the
+# fleet-canonical 0.2.2 pair sui-spec ships on — later published combos
+# skew (lib 0.2.4 + derive 0.2.77 fails to compile: the derive emits a
+# `parse_kwargs_strict` the lib lacks), so both are `=0.2.2` and the
+# derive is pinned explicitly to stop the loose internal req drifting.
+# The sexp→json→serde bridge the derive emits needs serde_json in scope.
+tatara-lisp = { version = "=0.2.2", optional = true }
+tatara-lisp-derive = { version = "=0.2.2", optional = true }
+serde_json = { version = "1", optional = true }
 # Mechanical ALL registry for the decoration vocabulary enum — per
 # the ★★ EMITTER SUBSTRATE rule, ALL is derived from the variants,
 # never hand-listed (macro farm, tatara-rust-ast). Build-time-only
