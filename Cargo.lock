@@ -191,7 +191,8 @@ checksum = "9f7c3e4beb33f85d45ae3e3a1792185706c8e16d043238c593331cc7cd313b50"
 [[package]]
 name = "pleme-allvariants-derive"
 version = "0.1.0"
-source = "git+https://github.com/pleme-io/pleme-allvariants-derive#c66f20d1dc5727cfa0d1f83a02a28609a13387ec"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6cb114bcd833314a8da4ca405f57aa7f4f1bffed58dcf4d41a020c2bc89a662a"
 dependencies = [
  "proc-macro2",
  "quote",

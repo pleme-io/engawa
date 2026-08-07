@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
-  "cargo_lock_sha256": "59f30cec39d420f583c7c4d0e9a76cfb39ea2ca6c0462a2c9b94e6f2d1ae92f9",
+  "cargo_lock_sha256": "252cd7e32d8771e04971f3ee687ea165b1f31d7bb2044118ff95886d7105a67b",
   "manifest_sha256": {
-    "Cargo.toml": "38ca81be2e28c002e192a27180dcd132552961a07880c9320cb1f58b88d562eb"
+    "Cargo.toml": "01d3ccf66912592d7794ee4d184fc2e6b6e03cef5e87e82d847011de21af94e4"
   },
   "target_resolves": {
     "base": {
@@ -54,7 +54,7 @@
         "runtime_dependencies": [
           {
             "name": "pleme_allvariants_derive",
-            "package_key": "pleme-allvariants-derive-0.1.0-c66f20d1dc5727cfa0d1f83a02a28609a13387ec",
+            "package_key": "pleme-allvariants-derive-0.1.0",
             "kind": "normal",
             "features": [],
             "uses_default_features": true,
@@ -385,7 +385,7 @@
           "std"
         ]
       },
-      "pleme-allvariants-derive-0.1.0-c66f20d1dc5727cfa0d1f83a02a28609a13387ec": {
+      "pleme-allvariants-derive-0.1.0": {
         "runtime_dependencies": [
           {
             "name": "proc_macro2",
@@ -1784,7 +1784,7 @@
     "once_cell-1.21.4": {
       "edition": "2021"
     },
-    "pleme-allvariants-derive-0.1.0-c66f20d1dc5727cfa0d1f83a02a28609a13387ec": {
+    "pleme-allvariants-derive-0.1.0": {
       "edition": "2024",
       "proc_macro": true
     },
@@ -1889,8 +1889,6 @@
       "build_script": "build.rs"
     }
   },
-  "git_nar_sha256": {
-    "pleme-allvariants-derive-0.1.0-c66f20d1dc5727cfa0d1f83a02a28609a13387ec": "sha256-XiO3eXRNjEzczetYv1+AYnyPrIuGpA/FYfRHD47QQYY="
-  },
+  "git_nar_sha256": {},
   "flake_metadata": {}
 }
