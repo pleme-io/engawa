@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
-  "cargo_lock_sha256": "07aa47ac3a0cf979217c527fc5b75966e73c52a5d43104b74139b56067620f76",
+  "cargo_lock_sha256": "e2f0990a0500d9b5822c4fef6302025603da849d77267c3cf3bcd68c7a381994",
   "manifest_sha256": {
-    "Cargo.toml": "dc6eb260fb690ade555cd67d25c84656d82b1874807dbd31e45d80bf4c2951c0"
+    "Cargo.toml": "547099c089f3024d895818519a25ef6859584cbe40514652ec07b1ad3ee570ee"
   },
   "target_resolves": {
     "base": {
@@ -50,7 +50,7 @@
         "build_dependencies": [],
         "features": []
       },
-      "engawa-0.1.5": {
+      "engawa-0.1.6": {
         "runtime_dependencies": [
           {
             "name": "pleme_allvariants_derive",
@@ -76,7 +76,7 @@
           },
           {
             "name": "thiserror",
-            "package_key": "thiserror-2.0.19",
+            "package_key": "thiserror-2.0.20",
             "kind": "normal",
             "features": [],
             "uses_default_features": true,
@@ -834,7 +834,7 @@
           },
           {
             "name": "syn",
-            "package_key": "syn-3.0.3",
+            "package_key": "syn-3.0.4",
             "kind": "normal",
             "features": [
               "clone-impls",
@@ -948,7 +948,7 @@
           "proc-macro"
         ]
       },
-      "syn-3.0.3": {
+      "syn-3.0.4": {
         "runtime_dependencies": [
           {
             "name": "proc_macro2",
@@ -1044,11 +1044,11 @@
           "getrandom"
         ]
       },
-      "thiserror-2.0.19": {
+      "thiserror-2.0.20": {
         "runtime_dependencies": [
           {
             "name": "thiserror_impl",
-            "package_key": "thiserror-impl-2.0.19",
+            "package_key": "thiserror-impl-2.0.20",
             "kind": "normal",
             "features": [],
             "uses_default_features": true,
@@ -1063,7 +1063,7 @@
           "std"
         ]
       },
-      "thiserror-impl-2.0.19": {
+      "thiserror-impl-2.0.20": {
         "runtime_dependencies": [
           {
             "name": "proc_macro2",
@@ -1087,7 +1087,7 @@
           },
           {
             "name": "syn",
-            "package_key": "syn-3.0.3",
+            "package_key": "syn-3.0.4",
             "kind": "normal",
             "features": [],
             "uses_default_features": true,
@@ -1779,7 +1779,7 @@
     "cfg-if-1.0.4": {
       "edition": "2018"
     },
-    "engawa-0.1.5": {
+    "engawa-0.1.6": {
       "edition": "2024",
       "lib_target": {
         "name": "engawa",
@@ -1889,17 +1889,17 @@
     "syn-2.0.119": {
       "edition": "2021"
     },
-    "syn-3.0.3": {
+    "syn-3.0.4": {
       "edition": "2021"
     },
     "tempfile-3.27.0": {
       "edition": "2021"
     },
-    "thiserror-2.0.19": {
+    "thiserror-2.0.20": {
       "edition": "2021",
       "build_script": "build.rs"
     },
-    "thiserror-impl-2.0.19": {
+    "thiserror-impl-2.0.20": {
       "edition": "2021",
       "proc_macro": true
     },
