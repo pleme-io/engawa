@@ -2,14 +2,16 @@
 //! reference impl.
 
 use engawa::{
-    DispatchError, Dispatcher, Material, Node, RecordingDispatcher, RenderGraph,
-    ResourceBindings, ResourceHandle, ResourceKind, ShaderSource,
+    DispatchError, Dispatcher, Material, Node, RecordingDispatcher, RenderGraph, ResourceBindings,
+    ResourceHandle, ResourceKind, ShaderSource,
 };
 
 fn dummy_material(name: &str) -> Material {
     Material::new(
         name,
-        ShaderSource::inline("@fragment fn fs_main() -> @location(0) vec4<f32> { return vec4<f32>(0.0); }"),
+        ShaderSource::inline(
+            "@fragment fn fs_main() -> @location(0) vec4<f32> { return vec4<f32>(0.0); }",
+        ),
         vec![],
     )
 }
@@ -62,7 +64,9 @@ fn recording_dispatcher_captures_execution_order() {
     let graph = linear_chain_graph();
     let bindings = bindings_for_chain();
     let mut dispatcher = RecordingDispatcher::new();
-    dispatcher.dispatch_graph(&graph, &bindings).expect("dispatch");
+    dispatcher
+        .dispatch_graph(&graph, &bindings)
+        .expect("dispatch");
 
     assert_eq!(dispatcher.len(), 2);
     let ids: Vec<_> = dispatcher.iter().map(|d| d.node_id.as_str()).collect();
@@ -74,7 +78,9 @@ fn recording_dispatcher_resolves_each_input_to_its_handle() {
     let graph = linear_chain_graph();
     let bindings = bindings_for_chain();
     let mut dispatcher = RecordingDispatcher::new();
-    dispatcher.dispatch_graph(&graph, &bindings).expect("dispatch");
+    dispatcher
+        .dispatch_graph(&graph, &bindings)
+        .expect("dispatch");
 
     // The "fx" node reads "A" and writes "B".
     let fx = &dispatcher.tape()[1];
@@ -98,7 +104,9 @@ fn recording_dispatcher_clear_node_has_no_inputs() {
     let graph = linear_chain_graph();
     let bindings = bindings_for_chain();
     let mut dispatcher = RecordingDispatcher::new();
-    dispatcher.dispatch_graph(&graph, &bindings).expect("dispatch");
+    dispatcher
+        .dispatch_graph(&graph, &bindings)
+        .expect("dispatch");
     let clear = &dispatcher.tape()[0];
     assert_eq!(clear.node_id.as_str(), "clear");
     assert!(clear.inputs.is_empty());
@@ -126,6 +134,9 @@ fn missing_input_binding_errors() {
             assert_eq!(resource.as_str(), "A");
         }
         DispatchError::Backend(other) => panic!("expected MissingBinding, got Backend({other})"),
+        DispatchError::Unsupported { node, capabilities } => {
+            panic!("expected MissingBinding, got Unsupported {node:?} / {capabilities:?}")
+        }
     }
 }
 
@@ -146,6 +157,9 @@ fn missing_output_binding_errors() {
             assert_eq!(resource.as_str(), "B");
         }
         DispatchError::Backend(other) => panic!("expected MissingBinding, got Backend({other})"),
+        DispatchError::Unsupported { node, capabilities } => {
+            panic!("expected MissingBinding, got Unsupported {node:?} / {capabilities:?}")
+        }
     }
 }
 
@@ -156,7 +170,9 @@ fn empty_graph_dispatches_as_zero_recordings() {
     let graph = RenderGraph::default().compile().unwrap();
     let bindings = ResourceBindings::new();
     let mut dispatcher = RecordingDispatcher::new();
-    dispatcher.dispatch_graph(&graph, &bindings).expect("dispatch");
+    dispatcher
+        .dispatch_graph(&graph, &bindings)
+        .expect("dispatch");
     assert!(dispatcher.is_empty());
 }
 

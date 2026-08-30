@@ -62,15 +62,26 @@
 //!
 //! ## Status
 //!
-//! v0.1.0 ships the pure-data IR + topo-sort + validation +
-//! extensive unit-test coverage. Wgpu wiring (taking a
-//! `CompiledGraph` and dispatching against a `wgpu::Device` + a
-//! garasu `HeadlessTarget`) lands in v0.2 once the IR has been
-//! exercised against mado's existing post-pipeline.
+//! The pure-data IR + topo-sort + validation ship here; wgpu
+//! wiring lives in `engawa-wgpu`, which is **shipped** (0.1.10 on
+//! crates.io) and used by mado in production.
+//!
+//! ★ CORRECTED 2026-08-30. This said the wgpu wiring "lands in
+//! v0.2". It had already landed. Read together with the same claim
+//! in `dispatch.rs`, that produced a fleet census entry of "blocked
+//! on engawa v0.2" and a promotion plan built on a gate that did
+//! not exist.
+//!
+//! What is genuinely NOT uniform is which IR fields a backend
+//! HONOURS — see [`capability`], added because `engawa-wgpu` reads
+//! `node.draw`, `node.depth`, `material.state`, `binding.group` and
+//! `binding.stages` zero times, so a consumer declaring an indexed
+//! mesh got a fullscreen triangle and no error.
 
 #![forbid(unsafe_code)]
 #![doc(html_root_url = "https://docs.rs/engawa/0.1.0")]
 
+pub mod capability;
 pub mod decoration;
 pub mod dispatch;
 pub mod effect;

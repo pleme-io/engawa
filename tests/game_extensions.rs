@@ -12,7 +12,8 @@ use engawa::{
     ResourceKind, ShaderSource, TextureFormat,
 };
 
-const LIT_WGSL: &str = "@fragment fn fs_main() -> @location(0) vec4<f32> { return vec4<f32>(1.0); }";
+const LIT_WGSL: &str =
+    "@fragment fn fs_main() -> @location(0) vec4<f32> { return vec4<f32>(1.0); }";
 
 /// A material with non-default render state: alpha blend + back-face cull.
 fn lit_material() -> Material {
@@ -114,7 +115,10 @@ fn defaults_are_backwards_compatible() {
     let clear = Node::clear("clr", "out");
     assert_eq!(clear.draw, DrawKind::FullscreenQuad);
     assert_eq!(clear.depth, None);
-    assert_eq!(Material::new("m", ShaderSource::inline("x"), vec![]).state, RenderState::default());
+    assert_eq!(
+        Material::new("m", ShaderSource::inline("x"), vec![]).state,
+        RenderState::default()
+    );
 
     // CompareFunction default is the common 3D choice.
     assert_eq!(DepthSpec::new("d").compare, CompareFunction::LessEqual);
@@ -148,4 +152,100 @@ fn pre_extension_ir_still_deserializes() {
             sample_count: None,
         }
     );
+}
+
+/// A backend that honours nothing beyond the default — i.e. one that has not
+/// declared, which is the shape EVERY backend has until someone writes the
+/// declaration.
+struct UndeclaredBackend(RecordingDispatcher);
+
+impl Dispatcher for UndeclaredBackend {
+    fn dispatch_node(
+        &mut self,
+        node: &Node,
+        bindings: &ResourceBindings,
+    ) -> Result<(), engawa::dispatch::DispatchError> {
+        self.0.dispatch_node(node, bindings)
+    }
+    // `capabilities()` deliberately NOT overridden — inherits MINIMAL.
+}
+
+/// ★ THE CONTRACT. Before it existed, `engawa-wgpu` read `node.draw`,
+/// `node.depth`, `material.state`, `binding.group` and `binding.stages` ZERO
+/// times (grep-proven 2026-08-30), so a consumer declaring an indexed mesh got
+/// a fullscreen triangle, `Ok(())`, and a wrong picture. The declaration was
+/// parsed, validated, topologically sorted — and dropped.
+#[test]
+fn an_undeclared_backend_refuses_a_geometry_draw_rather_than_drawing_a_quad() {
+    let graph = RenderGraph::default()
+        .with_resource(
+            "color",
+            ResourceKind::Texture {
+                width: None,
+                height: None,
+                format: Some(TextureFormat::Bgra8Unorm),
+                sample_count: None,
+            },
+        )
+        .with_output("color")
+        .with_node(mesh_node());
+    let compiled = graph.compile().expect("graph compiles");
+    let bindings =
+        ResourceBindings::new().with("color", ResourceHandle::Texture("color_tex".into()));
+
+    let mut backend = UndeclaredBackend(RecordingDispatcher::default());
+    let err = backend
+        .dispatch_graph(&compiled, &bindings)
+        .expect_err("a MINIMAL backend must REFUSE a geometry draw, not render a quad");
+
+    match err {
+        engawa::dispatch::DispatchError::Unsupported { node, capabilities } => {
+            assert_eq!(
+                capabilities,
+                // ★ BOTH gaps, not the first. This node declares an indexed
+                // draw AND a depth attachment; a single-capability error would
+                // have named one and sent the reader back for a second
+                // round-trip after fixing it. That regression is pinned here.
+                vec![
+                    engawa::capability::Capability::GeometryDraw,
+                    engawa::capability::Capability::Depth,
+                ]
+            );
+            assert_eq!(node.as_str(), "mesh", "the refusal must NAME the node");
+        }
+        other => panic!("expected Unsupported, got {other:?}"),
+    }
+    assert!(
+        backend.0.tape().is_empty(),
+        "nothing may be dispatched — a partly-rendered frame is harder to \
+         diagnose than none, because it looks like a different bug"
+    );
+}
+
+/// ANTI-VACUITY for the test above: the SAME graph through a backend that
+/// DECLARES the capability must succeed. Without this pair, the refusal test
+/// would pass equally against a dispatcher that refused everything.
+#[test]
+fn a_declaring_backend_dispatches_the_graph_that_minimal_refused() {
+    let graph = RenderGraph::default()
+        .with_resource(
+            "color",
+            ResourceKind::Texture {
+                width: None,
+                height: None,
+                format: Some(TextureFormat::Bgra8Unorm),
+                sample_count: None,
+            },
+        )
+        .with_output("color")
+        .with_node(mesh_node());
+    let compiled = graph.compile().expect("graph compiles");
+    let bindings =
+        ResourceBindings::new().with("color", ResourceHandle::Texture("color_tex".into()));
+
+    let mut rec = RecordingDispatcher::default();
+    assert_eq!(rec.capabilities(), engawa::capability::Capabilities::all());
+    rec.dispatch_graph(&compiled, &bindings)
+        .expect("a backend declaring all() dispatches what MINIMAL refused");
+    assert_eq!(rec.tape().len(), 1);
 }

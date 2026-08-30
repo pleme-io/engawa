@@ -30,19 +30,12 @@ pub enum ValidationError {
         "node {node:?} references resource {resource:?} that no other node produces \
          and that isn't declared as a graph input"
     )]
-    UnboundInput {
-        node: NodeId,
-        resource: ResourceId,
-    },
+    UnboundInput { node: NodeId, resource: ResourceId },
 
-    #[error(
-        "cycle detected in render graph; involved nodes: {0:?}"
-    )]
+    #[error("cycle detected in render graph; involved nodes: {0:?}")]
     Cycle(Vec<NodeId>),
 
-    #[error(
-        "graph output {0:?} is not produced by any node"
-    )]
+    #[error("graph output {0:?} is not produced by any node")]
     UnboundOutput(ResourceId),
 
     #[error(

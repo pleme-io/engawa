@@ -10,9 +10,8 @@
 #![allow(clippy::float_cmp)]
 
 use engawa::decoration::{
-    DASHED_DUTY, DASHED_PERIODS_PER_CELL, DOTTED_DUTY, DOTTED_PERIOD_PER_THICKNESS,
-    DecorationRect, UnderlineGeometry, UnderlineMetrics, UnderlineStyle, emit_underline_rects,
-    overline_rect,
+    DASHED_DUTY, DASHED_PERIODS_PER_CELL, DOTTED_DUTY, DOTTED_PERIOD_PER_THICKNESS, DecorationRect,
+    UnderlineGeometry, UnderlineMetrics, UnderlineStyle, emit_underline_rects, overline_rect,
 };
 
 const METRICS: UnderlineMetrics = UnderlineMetrics {
@@ -45,7 +44,13 @@ const MATRIX: &[MatrixRow] = &[
         check: |g| match g {
             UnderlineGeometry::Single(r) => {
                 let mut v = vec![];
-                if !rect_eq(*r, 0.0, METRICS.underline_y, METRICS.cell_width, METRICS.thickness) {
+                if !rect_eq(
+                    *r,
+                    0.0,
+                    METRICS.underline_y,
+                    METRICS.cell_width,
+                    METRICS.thickness,
+                ) {
                     v.push("Single rect must be the canonical stroke rect");
                 }
                 v
@@ -227,7 +232,10 @@ fn dotted_and_dashed_runs_are_distinct() {
     let (UnderlineGeometry::Run(dot), UnderlineGeometry::Run(dash)) = (dotted, dashed) else {
         panic!("dotted/dashed must both emit runs: {dotted:?} / {dashed:?}");
     };
-    assert_ne!(dot.duty, dash.duty, "duty must distinguish dotted from dashed");
+    assert_ne!(
+        dot.duty, dash.duty,
+        "duty must distinguish dotted from dashed"
+    );
     assert_ne!(
         dot.period, dash.period,
         "period must distinguish dotted from dashed under these metrics"

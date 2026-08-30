@@ -49,10 +49,20 @@ fn compute_then_render_compiles_and_orders_compute_first() {
     };
 
     let graph = RenderGraph::default()
-        .with_resource("particles", ResourceKind::Storage { size_bytes: 1024 * 16 })
+        .with_resource(
+            "particles",
+            ResourceKind::Storage {
+                size_bytes: 1024 * 16,
+            },
+        )
         .with_resource(
             "color",
-            ResourceKind::Texture { width: None, height: None, format: None, sample_count: None },
+            ResourceKind::Texture {
+                width: None,
+                height: None,
+                format: None,
+                sample_count: None,
+            },
         )
         .with_output("color")
         .with_node(present) // declared out of order on purpose
@@ -61,10 +71,17 @@ fn compute_then_render_compiles_and_orders_compute_first() {
     let compiled = graph.compile().expect("compute→render graph compiles");
     assert_eq!(compiled.node_count(), 2);
     let order: Vec<&str> = compiled.iter_nodes().map(|n| n.id.as_str()).collect();
-    assert_eq!(order, vec!["sim", "present"], "compute writer runs before its reader");
+    assert_eq!(
+        order,
+        vec!["sim", "present"],
+        "compute writer runs before its reader"
+    );
 
     // The compute node carries its dispatch grid.
-    let sim_node = compiled.iter_nodes().find(|n| n.id.as_str() == "sim").unwrap();
+    let sim_node = compiled
+        .iter_nodes()
+        .find(|n| n.id.as_str() == "sim")
+        .unwrap();
     assert_eq!(sim_node.pass, PassKind::Compute);
     assert_eq!(sim_node.dispatch, Some(ComputeDispatch::linear(1024, 64)));
 
@@ -73,7 +90,8 @@ fn compute_then_render_compiles_and_orders_compute_first() {
         .with("particles", ResourceHandle::Storage("particles_buf".into()))
         .with("color", ResourceHandle::Texture("color_tex".into()));
     let mut rec = RecordingDispatcher::default();
-    rec.dispatch_graph(&compiled, &bindings).expect("dispatch records");
+    rec.dispatch_graph(&compiled, &bindings)
+        .expect("dispatch records");
     assert_eq!(rec.tape().len(), 2);
 }
 
@@ -93,7 +111,9 @@ fn compute_node_without_dispatch_is_rejected() {
         .with_resource("particles", ResourceKind::Storage { size_bytes: 16 })
         .with_node(bad);
 
-    let err = graph.compile().expect_err("a dispatch-less compute node is invalid");
+    let err = graph
+        .compile()
+        .expect_err("a dispatch-less compute node is invalid");
     assert!(matches!(
         err,
         engawa::EngawaError::Validation(ValidationError::ComputeWithoutDispatch(ref id))

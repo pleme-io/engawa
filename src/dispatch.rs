@@ -12,11 +12,23 @@
 //!   so tests can assert "node X ran before node Y with these
 //!   bindings." Zero GPU; used by every engawa-adopting
 //!   consumer's test suite.
-//! * **`WgpuDispatcher`** (planned, v0.2) — real wgpu-backed
-//!   dispatch via `garasu::GpuContext`. Lives in a separate
-//!   crate (`engawa-wgpu`) so engawa's core stays free of the
-//!   wgpu dep for non-rendering consumers (graph linting,
-//!   visualization, lisp-side authoring).
+//! * **`WgpuDispatcher`** — real wgpu-backed dispatch via
+//!   `garasu::GpuContext`. Lives in a separate crate
+//!   (`engawa-wgpu`) so engawa's core stays free of the wgpu dep
+//!   for non-rendering consumers (graph linting, visualization,
+//!   lisp-side authoring).
+//!
+//!   ★ CORRECTED 2026-08-30. This said "(planned, v0.2)" and had
+//!   been wrong for some time: `engawa-wgpu` ships at 0.1.10 on
+//!   crates.io and mado calls `dispatch_with` in production. The
+//!   error propagated — a fleet census read this comment, recorded
+//!   "blocked on engawa v0.2", and a promotion plan was built on
+//!   it. A stale doc comment is not inert; it is an assertion that
+//!   gets believed.
+//! * **`MetalDispatcher`** (`asobi/crates/engawa-metal`) — a
+//!   SECOND backend, 2,348 lines, implementing the capability set
+//!   engawa-wgpu lacks. Two independent backends over one IR is
+//!   why `capability` exists.
 //!
 //! The two-impl pattern mirrors what every other pleme-io
 //! primitive does: shikumi's `ConfigStore` ships in-process
@@ -114,12 +126,26 @@ impl ResourceBindings {
 
 #[derive(Debug, Error, Clone, PartialEq, Eq)]
 pub enum DispatchError {
+    #[error("node {node:?} references resource {resource:?} but no binding was supplied")]
+    MissingBinding { node: NodeId, resource: ResourceId },
+    /// The graph declares a feature this backend does not honour.
+    ///
+    /// ★ This variant is the whole point of the capability contract. Before it
+    /// existed, a backend that ignored `node.draw` did not fail — it drew a
+    /// fullscreen triangle and returned `Ok`. An unhonoured declaration is now
+    /// a refusal that NAMES the node and the feature, so the operator learns it
+    /// at dispatch instead of by looking at a wrong picture.
     #[error(
-        "node {node:?} references resource {resource:?} but no binding was supplied"
+        "node {node:?} requires {} which this backend does not honour. The \
+         declaration(s) would have been SILENTLY IGNORED — engawa refuses rather \
+         than render something the graph did not describe.",
+        .capabilities.iter().map(ToString::to_string).collect::<Vec<_>>().join("; ")
     )]
-    MissingBinding {
+    Unsupported {
         node: NodeId,
-        resource: ResourceId,
+        /// EVERY gap for this node, not the first. A partial answer sends the
+        /// reader back for a second round-trip after fixing one of them.
+        capabilities: Vec<crate::capability::Capability>,
     },
     /// Per-consumer dispatch failure surfaces here so the trait
     /// returns one typed error variant regardless of backend.
@@ -147,6 +173,17 @@ pub trait Dispatcher {
         bindings: &ResourceBindings,
     ) -> Result<(), DispatchError>;
 
+    /// What this backend actually honours.
+    ///
+    /// ★ DEFAULTS TO [`Capabilities::MINIMAL`], deliberately: a backend that
+    /// has not declared anything is assumed to honour nothing beyond a
+    /// fullscreen draw. Defaulting to "everything" would preserve exactly the
+    /// silent-wrong-picture failure this contract removes, and would do it for
+    /// every backend written after this line.
+    fn capabilities(&self) -> crate::capability::Capabilities {
+        crate::capability::Capabilities::MINIMAL
+    }
+
     /// Walk `graph.execution_order`, validating bindings + then
     /// calling `dispatch_node` for each. The default impl
     /// handles all engawa-side concerns; backends typically
@@ -156,6 +193,21 @@ pub trait Dispatcher {
         graph: &CompiledGraph,
         bindings: &ResourceBindings,
     ) -> Result<(), DispatchError> {
+        // ★ CAPABILITY CHECK FIRST, before any node is dispatched. A graph
+        // that declares what this backend cannot honour must fail whole rather
+        // than render a partly-wrong frame: half a picture is harder to
+        // diagnose than none, because it looks like a different bug.
+        let have = self.capabilities();
+        for node in graph.iter_nodes() {
+            let gaps = crate::capability::required_for_node(node).missing_from(&have);
+            if !gaps.is_empty() {
+                return Err(DispatchError::Unsupported {
+                    node: node.id.clone(),
+                    capabilities: gaps,
+                });
+            }
+        }
+
         for node in graph.iter_nodes() {
             for input in &node.inputs {
                 if bindings.get(input).is_none() {
@@ -236,6 +288,19 @@ impl RecordingDispatcher {
 }
 
 impl Dispatcher for RecordingDispatcher {
+    /// The recorder honours every capability BY CONSTRUCTION — it records the
+    /// node and renders nothing, so there is no feature it can silently drop.
+    ///
+    /// ★ It must still SAY so. When the capability check landed, this
+    /// dispatcher had declared nothing, inherited `MINIMAL`, and immediately
+    /// refused `game_extensions::compiles_and_dispatches_a_depth_tested_indexed_mesh`
+    /// with `Unsupported { node: "mesh", capability: GeometryDraw }`. That is
+    /// the fail-closed default doing its job on its first run, against a real
+    /// test, before any backend was touched.
+    fn capabilities(&self) -> crate::capability::Capabilities {
+        crate::capability::Capabilities::all()
+    }
+
     fn dispatch_node(
         &mut self,
         node: &Node,

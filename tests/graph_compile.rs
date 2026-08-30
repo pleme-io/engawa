@@ -14,7 +14,9 @@ use engawa::{
 fn dummy_material(name: &str) -> Material {
     Material::new(
         name,
-        ShaderSource::inline("@vertex fn vs_main() -> @builtin(position) vec4<f32> { return vec4<f32>(0.0); }"),
+        ShaderSource::inline(
+            "@vertex fn vs_main() -> @builtin(position) vec4<f32> { return vec4<f32>(0.0); }",
+        ),
         vec![],
     )
 }
@@ -124,10 +126,7 @@ fn unbound_input_rejected_with_node_and_resource_id() {
         .with_resource("out", render_target(1, 1))
         .with_node(Node::fullscreen_effect("e", m, "missing", "out"));
     match g.compile() {
-        Err(engawa::EngawaError::Validation(ValidationError::UnboundInput {
-            node,
-            resource,
-        })) => {
+        Err(engawa::EngawaError::Validation(ValidationError::UnboundInput { node, resource })) => {
             assert_eq!(node.as_str(), "e");
             assert_eq!(resource.as_str(), "missing");
         }
@@ -251,10 +250,30 @@ fn pass_kind_serde_uses_snake_case() {
 #[test]
 fn effect_priorities_sort_predictably() {
     let mut effects = [
-        Effect { name: "chrome".into(), enabled: true, priority: 800, material: dummy_material("c") },
-        Effect { name: "scene".into(), enabled: true, priority: 100, material: dummy_material("s") },
-        Effect { name: "post".into(), enabled: true, priority: 500, material: dummy_material("p") },
-        Effect { name: "clear".into(), enabled: true, priority: 0, material: dummy_material("z") },
+        Effect {
+            name: "chrome".into(),
+            enabled: true,
+            priority: 800,
+            material: dummy_material("c"),
+        },
+        Effect {
+            name: "scene".into(),
+            enabled: true,
+            priority: 100,
+            material: dummy_material("s"),
+        },
+        Effect {
+            name: "post".into(),
+            enabled: true,
+            priority: 500,
+            material: dummy_material("p"),
+        },
+        Effect {
+            name: "clear".into(),
+            enabled: true,
+            priority: 0,
+            material: dummy_material("z"),
+        },
     ];
     effects.sort_by_key(|e| e.priority);
     let names: Vec<_> = effects.iter().map(|e| e.name.as_str()).collect();
@@ -264,11 +283,30 @@ fn effect_priorities_sort_predictably() {
 #[test]
 fn disabled_effects_filter_cleanly() {
     let effects = [
-        Effect { name: "on".into(), enabled: true, priority: 100, material: dummy_material("on") },
-        Effect { name: "off".into(), enabled: false, priority: 200, material: dummy_material("off") },
-        Effect { name: "on2".into(), enabled: true, priority: 300, material: dummy_material("on2") },
+        Effect {
+            name: "on".into(),
+            enabled: true,
+            priority: 100,
+            material: dummy_material("on"),
+        },
+        Effect {
+            name: "off".into(),
+            enabled: false,
+            priority: 200,
+            material: dummy_material("off"),
+        },
+        Effect {
+            name: "on2".into(),
+            enabled: true,
+            priority: 300,
+            material: dummy_material("on2"),
+        },
     ];
-    let active: Vec<_> = effects.iter().filter(|e| e.enabled).map(|e| e.name.as_str()).collect();
+    let active: Vec<_> = effects
+        .iter()
+        .filter(|e| e.enabled)
+        .map(|e| e.name.as_str())
+        .collect();
     assert_eq!(active, vec!["on", "on2"]);
 }
 
@@ -285,10 +323,7 @@ fn shader_source_display_short_truncates_inline() {
 #[test]
 fn shader_source_display_short_keeps_path_intact() {
     let s = ShaderSource::path("/etc/mado/effects/scanlines.wgsl");
-    assert_eq!(
-        s.display_short(),
-        "path:/etc/mado/effects/scanlines.wgsl"
-    );
+    assert_eq!(s.display_short(), "path:/etc/mado/effects/scanlines.wgsl");
 }
 
 // ── fluent constructors ────────────────────────────────────────

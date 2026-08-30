@@ -29,7 +29,12 @@ fn rid(i: u8) -> ResourceId {
 }
 
 fn texture() -> ResourceKind {
-    ResourceKind::Texture { width: Some(64), height: Some(64), format: None, sample_count: None }
+    ResourceKind::Texture {
+        width: Some(64),
+        height: Some(64),
+        format: None,
+        sample_count: None,
+    }
 }
 
 // ── the independent oracle: a second "is this well-formed?" implementation ──
@@ -82,8 +87,10 @@ fn well_formed(g: &RenderGraph) -> bool {
 /// Independent cycle detection over distinct producer→consumer edges (self-edges
 /// excluded — a node reading its own output is not a cycle).
 fn has_cycle(g: &RenderGraph, writers: &BTreeMap<&str, BTreeSet<&str>>) -> bool {
-    let producer: BTreeMap<&str, &str> =
-        writers.iter().map(|(r, w)| (*r, *w.iter().next().unwrap())).collect();
+    let producer: BTreeMap<&str, &str> = writers
+        .iter()
+        .map(|(r, w)| (*r, *w.iter().next().unwrap()))
+        .collect();
     let mut adj: BTreeMap<&str, BTreeSet<&str>> = BTreeMap::new();
     let mut indeg: BTreeMap<&str, usize> = g.nodes.iter().map(|n| (n.id.as_str(), 0)).collect();
     let mut edges: BTreeSet<(&str, &str)> = BTreeSet::new();
@@ -97,8 +104,11 @@ fn has_cycle(g: &RenderGraph, writers: &BTreeMap<&str, BTreeSet<&str>>) -> bool 
             }
         }
     }
-    let mut ready: Vec<&str> =
-        indeg.iter().filter(|(_, d)| **d == 0).map(|(k, _)| *k).collect();
+    let mut ready: Vec<&str> = indeg
+        .iter()
+        .filter(|(_, d)| **d == 0)
+        .map(|(k, _)| *k)
+        .collect();
     let mut visited = 0usize;
     while let Some(x) = ready.pop() {
         visited += 1;
@@ -123,11 +133,17 @@ fn check_compiled(g: &RenderGraph, c: &CompiledGraph) -> Result<(), String> {
     got.sort_unstable();
     want.sort_unstable();
     if got != want {
-        return Err(format!("execution order {got:?} is not a permutation of {want:?}"));
+        return Err(format!(
+            "execution order {got:?} is not a permutation of {want:?}"
+        ));
     }
     // Every producer of a node's inputs appears strictly earlier.
-    let pos: BTreeMap<&str, usize> =
-        c.execution_order.iter().enumerate().map(|(i, n)| (n.id.as_str(), i)).collect();
+    let pos: BTreeMap<&str, usize> = c
+        .execution_order
+        .iter()
+        .enumerate()
+        .map(|(i, n)| (n.id.as_str(), i))
+        .collect();
     let mut producer: BTreeMap<&str, &str> = BTreeMap::new();
     for n in &c.execution_order {
         for o in &n.outputs {
@@ -158,7 +174,11 @@ fn check_compiled(g: &RenderGraph, c: &CompiledGraph) -> Result<(), String> {
 fn arb_node() -> impl Strategy<Value = Node> {
     (
         0u8..N_NODE_IDS,
-        prop_oneof![Just(PassKind::Render), Just(PassKind::Compute), Just(PassKind::Blit)],
+        prop_oneof![
+            Just(PassKind::Render),
+            Just(PassKind::Compute),
+            Just(PassKind::Blit)
+        ],
         any::<bool>(),
         proptest::collection::btree_set(0u8..N_RES, 0..3),
         proptest::collection::btree_set(0u8..N_RES, 0..2),
@@ -248,9 +268,15 @@ fn node_reading_same_input_twice_compiles() {
             depth: None,
             dispatch: None,
         });
-    let compiled = g.compile().expect("reading one resource twice is one edge, not a cycle");
+    let compiled = g
+        .compile()
+        .expect("reading one resource twice is one edge, not a cycle");
     assert_eq!(compiled.node_count(), 2);
     // producer runs before consumer.
-    let order: Vec<&str> = compiled.execution_order.iter().map(|n| n.id.as_str()).collect();
+    let order: Vec<&str> = compiled
+        .execution_order
+        .iter()
+        .map(|n| n.id.as_str())
+        .collect();
     assert_eq!(order, vec!["producer", "consumer"]);
 }

@@ -134,8 +134,11 @@ impl RenderGraph {
         // inflated occurrence count that would strand it and read as a false
         // cycle. Order is deterministic: ready nodes are visited in BTreeSet
         // (sorted) order.
-        let nodes_by_id: BTreeMap<NodeId, Node> =
-            self.nodes.iter().map(|n| (n.id.clone(), n.clone())).collect();
+        let nodes_by_id: BTreeMap<NodeId, Node> = self
+            .nodes
+            .iter()
+            .map(|n| (n.id.clone(), n.clone()))
+            .collect();
         let mut edges: BTreeSet<(NodeId, NodeId)> = BTreeSet::new();
         for n in &self.nodes {
             for input in &n.inputs {

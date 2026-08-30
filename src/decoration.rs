@@ -59,8 +59,18 @@ impl Rgb {
 /// hand-listed ALL was the rot hole the M3 review closed (2026-06-12):
 /// the index-match "forcing function" was satisfiable without ever
 /// touching the registry.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Hash, Serialize, Deserialize)]
-#[derive(pleme_allvariants_derive::AllVariants)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Default,
+    Hash,
+    Serialize,
+    Deserialize,
+    pleme_allvariants_derive::AllVariants,
+)]
 #[serde(rename_all = "lowercase")]
 pub enum UnderlineStyle {
     #[default]
@@ -279,8 +289,7 @@ pub fn emit_underline_rects(style: UnderlineStyle, metrics: UnderlineMetrics) ->
             // the pre-2026-06-12 overflow). Floor at one thickness so
             // degenerate metrics still wave visibly; the band bottom
             // stays anchored at the Single stroke's bottom either way.
-            let amplitude = ((metrics.underline_y - metrics.baseline) / 2.0)
-                .max(metrics.thickness);
+            let amplitude = ((metrics.underline_y - metrics.baseline) / 2.0).max(metrics.thickness);
             UnderlineGeometry::Curly(CurlyBand {
                 rect: DecorationRect {
                     x: 0.0,
@@ -406,7 +415,10 @@ mod tests {
                 color_failures.push((color, got));
             }
         }
-        assert!(color_failures.is_empty(), "color wire drift: {color_failures:?}");
+        assert!(
+            color_failures.is_empty(),
+            "color wire drift: {color_failures:?}"
+        );
     }
 
     /// Display parity with the mado impls this module replaces —

@@ -142,7 +142,12 @@ impl ShaderSource {
                 format!("inline:{preview}")
             }
             ShaderSource::Path { path } => format!("path:{path}"),
-            ShaderSource::Msl { vertex, fragment, compute, .. } => {
+            ShaderSource::Msl {
+                vertex,
+                fragment,
+                compute,
+                ..
+            } => {
                 let v = vertex.as_deref().unwrap_or("-");
                 let f = fragment.as_deref().unwrap_or("-");
                 let c = compute.as_deref().unwrap_or("-");
@@ -170,19 +175,39 @@ pub struct ShaderStages {
 
 impl Default for ShaderStages {
     fn default() -> Self {
-        Self { vertex: true, fragment: true, compute: false }
+        Self {
+            vertex: true,
+            fragment: true,
+            compute: false,
+        }
     }
 }
 
 impl ShaderStages {
     /// Visible to the vertex stage only.
-    pub const VERTEX: Self = Self { vertex: true, fragment: false, compute: false };
+    pub const VERTEX: Self = Self {
+        vertex: true,
+        fragment: false,
+        compute: false,
+    };
     /// Visible to the fragment stage only.
-    pub const FRAGMENT: Self = Self { vertex: false, fragment: true, compute: false };
+    pub const FRAGMENT: Self = Self {
+        vertex: false,
+        fragment: true,
+        compute: false,
+    };
     /// Visible to both raster stages.
-    pub const BOTH: Self = Self { vertex: true, fragment: true, compute: false };
+    pub const BOTH: Self = Self {
+        vertex: true,
+        fragment: true,
+        compute: false,
+    };
     /// Visible to the compute stage only (a compute kernel's bindings).
-    pub const COMPUTE: Self = Self { vertex: false, fragment: false, compute: true };
+    pub const COMPUTE: Self = Self {
+        vertex: false,
+        fragment: false,
+        compute: true,
+    };
 }
 
 /// One binding slot in the material's `@group(g)`. The compiler
@@ -219,39 +244,75 @@ impl UniformBinding {
         stages: ShaderStages,
         resource: impl Into<ResourceId>,
     ) -> Self {
-        Self { group, binding, kind, stages, resource: resource.into() }
+        Self {
+            group,
+            binding,
+            kind,
+            stages,
+            resource: resource.into(),
+        }
     }
 
     /// A `@group(0)` per-frame uniform (`var<uniform>`) bound into both stages.
     #[must_use]
     pub fn uniform(binding: u32, resource: impl Into<ResourceId>) -> Self {
-        Self::new(0, binding, BindingKind::Uniform, ShaderStages::BOTH, resource)
+        Self::new(
+            0,
+            binding,
+            BindingKind::Uniform,
+            ShaderStages::BOTH,
+            resource,
+        )
     }
 
     /// A `@group(0)` fragment-stage `texture_2d<f32>` binding.
     #[must_use]
     pub fn texture(binding: u32, resource: impl Into<ResourceId>) -> Self {
-        Self::new(0, binding, BindingKind::Texture, ShaderStages::FRAGMENT, resource)
+        Self::new(
+            0,
+            binding,
+            BindingKind::Texture,
+            ShaderStages::FRAGMENT,
+            resource,
+        )
     }
 
     /// A `@group(0)` fragment-stage `sampler` binding.
     #[must_use]
     pub fn sampler(binding: u32, resource: impl Into<ResourceId>) -> Self {
-        Self::new(0, binding, BindingKind::Sampler, ShaderStages::FRAGMENT, resource)
+        Self::new(
+            0,
+            binding,
+            BindingKind::Sampler,
+            ShaderStages::FRAGMENT,
+            resource,
+        )
     }
 
     /// A `@group(0)` compute-stage `var<storage, read_write>` binding — a
     /// compute kernel's scratch / output buffer.
     #[must_use]
     pub fn storage_rw(binding: u32, resource: impl Into<ResourceId>) -> Self {
-        Self::new(0, binding, BindingKind::StorageReadWrite, ShaderStages::COMPUTE, resource)
+        Self::new(
+            0,
+            binding,
+            BindingKind::StorageReadWrite,
+            ShaderStages::COMPUTE,
+            resource,
+        )
     }
 
     /// A `@group(0)` compute-stage `var<storage, read>` binding — a compute
     /// kernel's read-only input buffer.
     #[must_use]
     pub fn storage_read(binding: u32, resource: impl Into<ResourceId>) -> Self {
-        Self::new(0, binding, BindingKind::StorageRead, ShaderStages::COMPUTE, resource)
+        Self::new(
+            0,
+            binding,
+            BindingKind::StorageRead,
+            ShaderStages::COMPUTE,
+            resource,
+        )
     }
 }
 

@@ -9,7 +9,12 @@ use engawa::{Material, ShaderSource, UniformBinding};
 fn msl_render_carries_explicit_entry_names() {
     let s = ShaderSource::msl_render("// msl", "vs_main", "fs_main");
     match &s {
-        ShaderSource::Msl { source, vertex, fragment, compute } => {
+        ShaderSource::Msl {
+            source,
+            vertex,
+            fragment,
+            compute,
+        } => {
             assert_eq!(source, "// msl");
             assert_eq!(vertex.as_deref(), Some("vs_main"));
             assert_eq!(fragment.as_deref(), Some("fs_main"));
@@ -24,7 +29,12 @@ fn msl_render_carries_explicit_entry_names() {
 fn msl_compute_carries_only_the_compute_entry() {
     let s = ShaderSource::msl_compute("// kernel", "cs_main");
     match &s {
-        ShaderSource::Msl { vertex, fragment, compute, .. } => {
+        ShaderSource::Msl {
+            vertex,
+            fragment,
+            compute,
+            ..
+        } => {
             assert!(vertex.is_none() && fragment.is_none());
             assert_eq!(compute.as_deref(), Some("cs_main"));
         }
