@@ -1,7 +1,6 @@
 # engawa — typed render-graph IR for pleme-io
 
-Canonical spec. The companion to `~/code/github/pleme-io/theory/`
-docs that cite this from the GPU-consumer chapters.
+Canonical spec.
 
 ## I. The frame
 

@@ -75,7 +75,7 @@ for node in compiled.iter_nodes() {
 
 ## Why this exists
 
-[`theory/ENGAWA.md`](docs/ENGAWA.md) is the canonical spec: why a
+[`docs/ENGAWA.md`](docs/ENGAWA.md) is the canonical spec: why a
 custom IR beats forking bevy_render, the typed-DAG design, the layering
 with `garasu` + `madori` + `shikumi`, and the 4-phase roadmap.
 
